@@ -2,12 +2,36 @@ import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { GripVertical, X, Plus } from 'lucide-react';
 
-const SetupPage = ({ tasks, setTasks, projectName, setProjectName, processName, setProcessName, onStartTiming }) => {
-  const [newTaskName, setNewTaskName] = useState('');
-  const [draggedTask, setDraggedTask] = useState(null);
-  const [draggedOverTask, setDraggedOverTask] = useState(null);
+interface Task {
+  id: number;
+  name: string;
+  times: number[];
+  currentTime: number | null;
+  completed: boolean;
+}
 
-  const handleAddTask = (e) => {
+const SetupPage = ({ 
+  tasks, 
+  setTasks, 
+  projectName, 
+  setProjectName, 
+  processName, 
+  setProcessName, 
+  onStartTiming 
+}: {
+  tasks: Task[];
+  setTasks: (tasks: Task[]) => void;
+  projectName: string;
+  setProjectName: (name: string) => void;
+  processName: string;
+  setProcessName: (name: string) => void;
+  onStartTiming: () => void;
+}) => {
+  const [newTaskName, setNewTaskName] = useState('');
+  const [draggedTask, setDraggedTask] = useState<Task | null>(null);
+  const [draggedOverTask, setDraggedOverTask] = useState<Task | null>(null);
+
+  const handleAddTask = (e: React.FormEvent) => {
     e.preventDefault();
     if (newTaskName.trim()) {
       setTasks([
@@ -24,20 +48,20 @@ const SetupPage = ({ tasks, setTasks, projectName, setProjectName, processName, 
     }
   };
 
-  const handleDeleteTask = (taskId) => {
+  const handleDeleteTask = (taskId: number) => {
     setTasks(tasks.filter(task => task.id !== taskId));
   };
 
-  const handleDragStart = (task) => {
+  const handleDragStart = (task: Task) => {
     setDraggedTask(task);
   };
 
-  const handleDragOver = (e, task) => {
+  const handleDragOver = (e: React.DragEvent, task: Task) => {
     e.preventDefault();
     setDraggedOverTask(task);
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     if (!draggedTask || !draggedOverTask) return;
 
@@ -135,7 +159,17 @@ const SetupPage = ({ tasks, setTasks, projectName, setProjectName, processName, 
   );
 };
 
-const TimingPage = ({ tasks, setTasks, projectName, processName }) => {
+const TimingPage = ({ 
+  tasks, 
+  setTasks, 
+  projectName, 
+  processName 
+}: {
+  tasks: Task[];
+  setTasks: (tasks: Task[]) => void;
+  projectName: string;
+  processName: string;
+}) => {
   const [isRunning, setIsRunning] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [processComplete, setProcessComplete] = useState(false);
@@ -163,34 +197,54 @@ const TimingPage = ({ tasks, setTasks, projectName, processName }) => {
     setLastCycleEndTime(0);
   };
 
-  const completeTask = (taskId) => {
-    const taskIndex = tasks.findIndex(t => t.id === taskId);
+  interface Task {
+    id: number;
+    name: string;
+    times: number[];
+    currentTime: number | null;
+    completed: boolean;
+  }
+
+  const completeTask = (taskId: number) => {
+    const taskIndex = tasks.findIndex((t: Task) => t.id === taskId);
     const previousTime = taskIndex > 0 ? 
-      tasks[taskIndex - 1].currentTime : 
+      tasks[taskIndex - 1].currentTime || 0 : 
       lastCycleEndTime;
     
     const cycleTime = elapsedTime - previousTime;
 
-    setTasks(tasks.map(task => {
-      if (task.id === taskId) {
-        return {
-          ...task,
-          completed: true,
-          currentTime: elapsedTime,
-          times: [...task.times, cycleTime]
-        };
-      }
-      return task;
-    }));
+    // Create new task with updated times
+    const updatedTask = {
+      ...tasks[taskIndex],
+      completed: true,
+      currentTime: elapsedTime,
+      times: [...tasks[taskIndex].times, cycleTime]
+    };
 
-    // Check if all tasks are complete
-    const allCompleted = tasks.every((task, idx) => 
-      idx === taskIndex ? true : task.completed
-    );
+    // Create new tasks array with the updated task
+    const updatedTasks = [
+      ...tasks.slice(0, taskIndex),
+      updatedTask,
+      ...tasks.slice(taskIndex + 1)
+    ];
 
-    if (allCompleted) {
+    // Update tasks state
+    setTasks(updatedTasks);
+
+    // Check if this was the last task
+    if (taskIndex === tasks.length - 1) {
       setLastCycleEndTime(elapsedTime);
-      resetForNextCycle();
+      // Wait for state to update before resetting
+      Promise.resolve().then(() => {
+        // Start a new cycle after a short delay
+        setTimeout(() => {
+          setTasks(updatedTasks.map(task => ({
+            ...task,
+            completed: false,
+            currentTime: null
+          })));
+        }, 100);
+      });
     }
   };
 
@@ -207,7 +261,7 @@ const TimingPage = ({ tasks, setTasks, projectName, processName }) => {
     setProcessComplete(true);
   };
 
-  const calculateStats = (times) => {
+  const calculateStats = (times: number[]) => {
     if (times.length === 0) return { n: 0, xbar: 0, min: 0, max: 0 };
     return {
       n: times.length,
@@ -326,7 +380,7 @@ const TimingPage = ({ tasks, setTasks, projectName, processName }) => {
 };
 
 const ZoomZoomyDemo = () => {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [projectName, setProjectName] = useState('');
   const [processName, setProcessName] = useState('');
   const [isSetupComplete, setIsSetupComplete] = useState(false);
