@@ -139,6 +139,7 @@ const TimingPage = ({ tasks, setTasks, projectName, processName }) => {
   const [isRunning, setIsRunning] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [processComplete, setProcessComplete] = useState(false);
+  const [lastCycleEndTime, setLastCycleEndTime] = useState(0);
 
   useEffect(() => {
     let interval;
@@ -159,11 +160,15 @@ const TimingPage = ({ tasks, setTasks, projectName, processName }) => {
       currentTime: null
     })));
     setElapsedTime(0);
+    setLastCycleEndTime(0);
   };
 
   const completeTask = (taskId) => {
     const taskIndex = tasks.findIndex(t => t.id === taskId);
-    const previousTime = taskIndex > 0 ? tasks[taskIndex - 1].currentTime || 0 : 0;
+    const previousTime = taskIndex > 0 ? 
+      tasks[taskIndex - 1].currentTime : 
+      lastCycleEndTime;
+    
     const cycleTime = elapsedTime - previousTime;
 
     setTasks(tasks.map(task => {
@@ -178,11 +183,13 @@ const TimingPage = ({ tasks, setTasks, projectName, processName }) => {
       return task;
     }));
 
+    // Check if all tasks are complete
     const allCompleted = tasks.every((task, idx) => 
       idx === taskIndex ? true : task.completed
     );
 
     if (allCompleted) {
+      setLastCycleEndTime(elapsedTime);
       resetForNextCycle();
     }
   };

@@ -1,5 +1,5 @@
 import React from 'react';
-import ZoomZoomyDemo from './ZoomZoomyDemo';
+import ZoomZoomyDemo from './ZoomZoomyDemo.tsx';
 
 function App() {
   return (
