@@ -182,6 +182,7 @@ const TimingPage = ({
   const [elapsedTime, setElapsedTime] = useState(0);
   const [processComplete, setProcessComplete] = useState(false);
   const [lastCycleEndTime, setLastCycleEndTime] = useState(0);
+  const [cycleTimes, setCycleTimes] = useState<number[]>([]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined;
@@ -202,7 +203,8 @@ const TimingPage = ({
       currentTime: null
     })));
     setElapsedTime(0);
-    setLastCycleEndTime(0);
+      setLastCycleEndTime(0);
+      setCycleTimes([]);
   };
 
   const completeTask = (taskId: number) => {
@@ -229,7 +231,9 @@ const TimingPage = ({
     setTasks(updatedTasks);
 
     if (taskIndex === tasks.length - 1) {
+      const cycleTime = elapsedTime - lastCycleEndTime;
       setLastCycleEndTime(elapsedTime);
+      setCycleTimes(prev => [...prev, cycleTime]);
       Promise.resolve().then(() => {
         setTimeout(() => {
           setTasks(updatedTasks.map(task => ({
@@ -266,9 +270,9 @@ const TimingPage = ({
   };
 
   const getChartData = () => {
-    return tasks.map(task => ({
-      name: task.name,
-      average: calculateStats(task.times).xbar
+    return cycleTimes.map((time, index) => ({
+      name: `Cycle ${index + 1}`,
+      time: time
     }));
   };
 
@@ -354,7 +358,7 @@ const TimingPage = ({
           </div>
 
           <div className="mt-8">
-            <h2 className="text-xl font-bold mb-4">Task Time Analysis</h2>
+            <h2 className="text-xl font-bold mb-4">Cycle Time Analysis</h2>
             <div className="w-full h-[400px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
@@ -362,11 +366,45 @@ const TimingPage = ({
                   layout="vertical" 
                   margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                 >
-                  <XAxis type="number" />
-                  <YAxis type="category" dataKey="name" width={150} />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="average" fill="#82ca9d" name="Avg Time (s)" />
+                  <XAxis 
+                    type="number" 
+                    label={{ 
+                      value: 'Total Cycle Time (s)', 
+                      position: 'bottom',
+                      style: { fill: 'white' }
+                    }} 
+                  />
+                  <YAxis 
+                    type="category" 
+                    dataKey="name" 
+                    width={150}
+                    style={{ fill: 'white' }}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#1a1a1a',
+                      border: '1px solid #333'
+                    }}
+                    labelStyle={{ color: 'white' }}
+                    itemStyle={{ color: 'white' }}
+                  />
+                  <Bar 
+                    dataKey="time" 
+                    name="Cycle Time (s)"
+                    fill="#FFD700"
+                    label={{
+                      position: 'center',
+                      fill: '#000',
+                      formatter: (value: number) => `${value.toFixed(1)}s`,
+                      offset: 10
+                    }}
+                    onMouseOver={(data, index) => {
+                      document.querySelector(`[datakey="time"][index="${index}"]`)?.setAttribute('fill', '#FFA500');
+                    }}
+                    onMouseOut={(data, index) => {
+                      document.querySelector(`[datakey="time"][index="${index}"]`)?.setAttribute('fill', '#FFD700');
+                    }}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
