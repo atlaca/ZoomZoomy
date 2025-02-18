@@ -279,21 +279,21 @@ const TimingPage = ({
         <h2 className="text-lg text-gray-400">{processName}</h2>
       </div>
 
-      <div className="flex justify-between mb-4">
-        <div className="text-2xl">
+      <div className="flex flex-col items-center mb-8">
+        <div className="text-4xl mb-12">
           {elapsedTime.toFixed(1)}s
         </div>
-        <div className="space-x-2">
+        <div className="flex justify-center space-x-4">
           <button
             onClick={startProcess}
-            className="bg-blue-500 px-4 py-2 rounded"
+            className="bg-blue-500 px-6 py-3 rounded"
             disabled={isRunning}
           >
             START PROCESS
           </button>
           <button
             onClick={endProcess}
-            className="bg-red-500 px-4 py-2 rounded"
+            className="bg-red-500 px-6 py-3 rounded"
             disabled={!isRunning}
           >
             PROCESS COMPLETE
