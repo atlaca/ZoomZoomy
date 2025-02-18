@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/zoomzoomy/static/css/main.9d254544.css",
+    "main.js": "/zoomzoomy/static/js/main.eef64efb.js",
+    "index.html": "/zoomzoomy/index.html",
+    "main.9d254544.css.map": "/zoomzoomy/static/css/main.9d254544.css.map",
+    "main.eef64efb.js.map": "/zoomzoomy/static/js/main.eef64efb.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.9d254544.css",
+    "static/js/main.eef64efb.js"
+  ]
+}
