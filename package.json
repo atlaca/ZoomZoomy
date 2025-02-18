@@ -1,5 +1,5 @@
 {
-  "homepage": "http://atlaca.github.io/zoomzoomy",
+  "homepage": "https://atlaca.github.io/ZoomZoomy",
   "name": "zoomzoomy",
   "version": "1.0.0",
   "description": "",
@@ -19,6 +19,7 @@
     "@babel/core": "^7.26.9",
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-react": "^7.26.3",
+    "@types/recharts": "^1.8.29",
     "lucide-react": "^0.475.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

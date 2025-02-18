@@ -1,5 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+Import React, { useState, useEffect } from 'react';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  Tooltip, 
+  Legend,
+  ResponsiveContainer 
+} from 'recharts';
 import { GripVertical, X, Plus } from 'lucide-react';
 
 interface Task {
@@ -28,10 +36,10 @@ const SetupPage = ({
   onStartTiming: () => void;
 }) => {
   const [newTaskName, setNewTaskName] = useState('');
-  const [draggedTask, setDraggedTask] = useState<Task | null>(null);
-  const [draggedOverTask, setDraggedOverTask] = useState<Task | null>(null);
+  const [draggedTask, setDraggedTask] = useState(null as Task | null);
+  const [draggedOverTask, setDraggedOverTask] = useState(null as Task | null);
 
-  const handleAddTask = (e: React.FormEvent) => {
+  const handleAddTask = (e: { preventDefault: () => void }) => {
     e.preventDefault();
     if (newTaskName.trim()) {
       setTasks([
@@ -56,12 +64,12 @@ const SetupPage = ({
     setDraggedTask(task);
   };
 
-  const handleDragOver = (e: React.DragEvent, task: Task) => {
+  const handleDragOver = (e: { preventDefault: () => void }, task: Task) => {
     e.preventDefault();
     setDraggedOverTask(task);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (e: { preventDefault: () => void }) => {
     e.preventDefault();
     if (!draggedTask || !draggedOverTask) return;
 
@@ -176,7 +184,7 @@ const TimingPage = ({
   const [lastCycleEndTime, setLastCycleEndTime] = useState(0);
 
   useEffect(() => {
-    let interval;
+    let interval: NodeJS.Timeout | undefined;
     if (isRunning) {
       interval = setInterval(() => {
         setElapsedTime(prev => prev + 0.1);
@@ -197,23 +205,14 @@ const TimingPage = ({
     setLastCycleEndTime(0);
   };
 
-  interface Task {
-    id: number;
-    name: string;
-    times: number[];
-    currentTime: number | null;
-    completed: boolean;
-  }
-
   const completeTask = (taskId: number) => {
-    const taskIndex = tasks.findIndex((t: Task) => t.id === taskId);
+    const taskIndex = tasks.findIndex(t => t.id === taskId);
     const previousTime = taskIndex > 0 ? 
       tasks[taskIndex - 1].currentTime || 0 : 
       lastCycleEndTime;
     
     const cycleTime = elapsedTime - previousTime;
 
-    // Create new task with updated times
     const updatedTask = {
       ...tasks[taskIndex],
       completed: true,
@@ -221,22 +220,17 @@ const TimingPage = ({
       times: [...tasks[taskIndex].times, cycleTime]
     };
 
-    // Create new tasks array with the updated task
     const updatedTasks = [
       ...tasks.slice(0, taskIndex),
       updatedTask,
       ...tasks.slice(taskIndex + 1)
     ];
 
-    // Update tasks state
     setTasks(updatedTasks);
 
-    // Check if this was the last task
     if (taskIndex === tasks.length - 1) {
       setLastCycleEndTime(elapsedTime);
-      // Wait for state to update before resetting
       Promise.resolve().then(() => {
-        // Start a new cycle after a short delay
         setTimeout(() => {
           setTasks(updatedTasks.map(task => ({
             ...task,
@@ -280,13 +274,11 @@ const TimingPage = ({
 
   return (
     <div className="p-4 min-h-screen bg-black text-white">
-      {/* Header */}
       <div className="mb-6">
         <h1 className="text-xl font-bold">{projectName}</h1>
         <h2 className="text-lg text-gray-400">{processName}</h2>
       </div>
 
-      {/* Controls */}
       <div className="flex justify-between mb-4">
         <div className="text-2xl">
           {elapsedTime.toFixed(1)}s
@@ -309,7 +301,6 @@ const TimingPage = ({
         </div>
       </div>
 
-      {/* Task List */}
       <div className="space-y-2">
         {tasks.map(task => (
           <div key={task.id} className="flex justify-between items-center p-2 border border-gray-700 rounded">
@@ -331,7 +322,6 @@ const TimingPage = ({
         ))}
       </div>
 
-      {/* Statistics */}
       {processComplete && (
         <div className="mt-8">
           <h2 className="text-xl font-bold mb-4">Statistics</h2>
@@ -363,15 +353,23 @@ const TimingPage = ({
             </table>
           </div>
 
-          {/* Stacked Bar Chart */}
-          <div className="mt-8 h-64">
-            <BarChart data={getChartData()} layout="vertical">
-              <XAxis type="number" />
-              <YAxis type="category" dataKey="name" />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="average" fill="#82ca9d" name="Avg Time (s)" />
-            </BarChart>
+          <div className="mt-8">
+            <h2 className="text-xl font-bold mb-4">Task Time Analysis</h2>
+            <div className="w-full h-[400px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={getChartData()} 
+                  layout="vertical" 
+                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                >
+                  <XAxis type="number" />
+                  <YAxis type="category" dataKey="name" width={150} />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="average" fill="#82ca9d" name="Avg Time (s)" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
       )}
@@ -380,7 +378,7 @@ const TimingPage = ({
 };
 
 const ZoomZoomyDemo = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState([] as Task[]);
   const [projectName, setProjectName] = useState('');
   const [processName, setProcessName] = useState('');
   const [isSetupComplete, setIsSetupComplete] = useState(false);
