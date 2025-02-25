@@ -8,8 +8,7 @@ import {
   Legend,
   ResponsiveContainer 
 } from 'recharts';
-import { GripVertical, X, Plus, Download } from 'lucide-react';
-import * as XLSX from 'xlsx';
+import { GripVertical, X, Plus } from 'lucide-react';
 
 interface Task {
   id: number;
@@ -17,14 +16,6 @@ interface Task {
   times: number[];
   currentTime: number | null;
   completed: boolean;
-}
-
-interface TaskStats {
-  name: string;
-  n: number;
-  xbar: number;
-  min: number;
-  max: number;
 }
 
 const SetupPage = ({ 
@@ -44,7 +35,6 @@ const SetupPage = ({
   setProcessName: (name: string) => void;
   onStartTiming: () => void;
 }) => {
-  // [Setup page code remains unchanged]
   const [newTaskName, setNewTaskName] = useState('');
   const [draggedTask, setDraggedTask] = useState(null as Task | null);
   const [draggedOverTask, setDraggedOverTask] = useState(null as Task | null);
@@ -213,8 +203,8 @@ const TimingPage = ({
       currentTime: null
     })));
     setElapsedTime(0);
-    setLastCycleEndTime(0);
-    setCycleTimes([]);
+      setLastCycleEndTime(0);
+      setCycleTimes([]);
   };
 
   const completeTask = (taskId: number) => {
@@ -284,50 +274,6 @@ const TimingPage = ({
       name: `Cycle ${index + 1}`,
       time: time
     }));
-  };
-
-  // New Excel export function
-  const exportData = () => {
-    try {
-      const workbook = XLSX.utils.book_new();
-      
-      // Create worksheet for step statistics
-      const taskStats: TaskStats[] = tasks.map(task => {
-        const stats = calculateStats(task.times);
-        return {
-          name: task.name,
-          n: stats.n,
-          xbar: parseFloat(stats.xbar.toFixed(1)),
-          min: parseFloat(stats.min.toFixed(1)),
-          max: parseFloat(stats.max.toFixed(1))
-        };
-      });
-      
-      const stepWorksheet = XLSX.utils.json_to_sheet(taskStats);
-      
-      // Add headers to step statistics worksheet
-      XLSX.utils.sheet_add_aoa(stepWorksheet, [["Task", "n", "Xbar (s)", "MIN (s)", "MAX (s)"]], { origin: "A1" });
-      XLSX.utils.book_append_sheet(workbook, stepWorksheet, "Step Statistics");
-      
-      // Create worksheet for cycle times
-      const cycleData = cycleTimes.map((time, index) => ({
-        cycle: `Cycle ${index + 1}`,
-        time: parseFloat(time.toFixed(1))
-      }));
-      
-      const cycleWorksheet = XLSX.utils.json_to_sheet(cycleData);
-      
-      // Add headers to cycle times worksheet
-      XLSX.utils.sheet_add_aoa(cycleWorksheet, [["Cycle", "Total Time (s)"]], { origin: "A1" });
-      XLSX.utils.book_append_sheet(workbook, cycleWorksheet, "Total Cycle Statistics");
-      
-      // Generate Excel file
-      const fileName = `${projectName || 'Project'}_${processName || 'Process'}_${new Date().toISOString().split('T')[0]}.xlsx`;
-      XLSX.writeFile(workbook, fileName);
-    } catch (error) {
-      console.error("Error exporting data:", error);
-      alert("Failed to export data. Please try again.");
-    }
   };
 
   return (
@@ -462,17 +408,6 @@ const TimingPage = ({
                 </BarChart>
               </ResponsiveContainer>
             </div>
-          </div>
-          
-          {/* New Export Data Button */}
-          <div className="flex justify-center mt-10 mb-10">
-            <button
-              onClick={exportData}
-              className="bg-gray-300 hover:bg-gray-400 text-black font-bold px-6 py-3 rounded flex items-center gap-2"
-            >
-              <Download size={20} />
-              EXPORT DATA
-            </button>
           </div>
         </div>
       )}
