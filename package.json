@@ -24,7 +24,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-scripts": "^5.0.1",
-    "recharts": "^2.15.1"
+    "recharts": "^2.15.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
