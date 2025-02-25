@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/ZoomZoomy/static/css/main.e38387a3.css",
-    "main.js": "/ZoomZoomy/static/js/main.5ad0f8ce.js",
+    "main.css": "/ZoomZoomy/static/css/main.8f937748.css",
+    "main.js": "/ZoomZoomy/static/js/main.e34859d7.js",
     "index.html": "/ZoomZoomy/index.html",
-    "main.e38387a3.css.map": "/ZoomZoomy/static/css/main.e38387a3.css.map",
-    "main.5ad0f8ce.js.map": "/ZoomZoomy/static/js/main.5ad0f8ce.js.map"
+    "main.8f937748.css.map": "/ZoomZoomy/static/css/main.8f937748.css.map",
+    "main.e34859d7.js.map": "/ZoomZoomy/static/js/main.e34859d7.js.map"
   },
   "entrypoints": [
-    "static/css/main.e38387a3.css",
-    "static/js/main.5ad0f8ce.js"
+    "static/css/main.8f937748.css",
+    "static/js/main.e34859d7.js"
   ]
 }
