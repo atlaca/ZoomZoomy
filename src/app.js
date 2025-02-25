@@ -7,7 +7,7 @@ function App() {
       <img 
         src="/ZoomZoomy/FFCC-Logo.png" 
         alt="FFCC Logo" 
-        className="absolute top-16 right-8 w-[130px] h-auto"
+        className="absolute top-1 right-8 w-[130px] h-auto"
       />
       <ZoomZoomyDemo />
     </div>
